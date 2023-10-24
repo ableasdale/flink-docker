@@ -2,6 +2,7 @@ version: '2.1'
 services:
   sql-client:
     image: jark/demo-sql-client:0.2
+    container_name: sql-client
     depends_on:
       - broker
       - jobmanager
@@ -29,14 +30,15 @@ services:
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
         taskmanager.numberOfTaskSlots: 10
-  # datagen:
-  #   image: jark/datagen:0.2
-  #   command: "java -classpath /opt/datagen/flink-sql-demo.jar myflink.SourceGenerator --input /opt/datagen/user_behavior.log --output kafka kafka:9094 --speedup 2000"
-  #   depends_on:
-  #     - kafka
-  #   environment:
-  #     ZOOKEEPER_CONNECT: zookeeper
-  #     KAFKA_BOOTSTRAP: kafka
+
+  # TODO - replace this...
+  datagen:
+    image: jark/datagen:0.2
+    command: "java -classpath /opt/datagen/flink-sql-demo.jar myflink.SourceGenerator --input /opt/datagen/user_behavior.log --output kafka broker:9092 --speedup 2000"
+    depends_on:
+      - broker
+    environment:
+      KAFKA_BOOTSTRAP: broker
   
   broker:
     image: confluentinc/cp-server:${CP_TAG}
